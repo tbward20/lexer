@@ -24,7 +24,7 @@ TokenType makeToken(TokenType type) {
 }
 
 int ident_error(char * txt, int line) {
-  cout << "identifier" << txt << "too long on line" << line << endl;
+  cout << "identifier " << txt << " too long on line " << line << endl;
   return -1;
 }
 
@@ -77,6 +77,14 @@ Print/{follow}?       { return makeToken(T_Print); }
 ReadInteger/{follow}? { return makeToken(T_ReadInteger); }
 ReadLine/{follow}?    { return makeToken(T_ReadLine); }
 
+  /* Int constant */
+[0-9]+|0[xX][a-fA-F0-9]+ { return makeToken(T_IntConstant); }
+
+  /* Boolean constant */
+true|false {return makeToken(T_BoolConstant); }
+
+  /* Double Constant */
+[0-9]+.[0-9]*([eE]-?[0-9]+) { return makeToken(T_DoubleConstant); }
 
   /* identifier */
 [A-Za-z][A-Za-z0-9_]*/{follow}? { if (yyleng > 31) return ident_error(yytext, yylineno); return makeToken(T_Identifier); }
@@ -99,15 +107,6 @@ ReadLine/{follow}?    { return makeToken(T_ReadLine); }
 	         myTok = new Token(T_StringConstant,resultString + "\"", 
                                   yylineno);
 		 return T_StringConstant; }
-
-  /* Int constant */
-[0-9]+|0[xX][a-fA-F0-9]+ { return makeToken(T_IntConstant); }
-
-  /* Boolean constant */
-true|false {return makeToken(T_BoolConstant); }
-
-  /* Double Constant */
-[0-9]+.[0-9]+ { return makeToken(T_DoubleConstant); }
 
   /* Operator tokens */
 \+   { return makeToken(T_Plus); }
@@ -137,11 +136,12 @@ true|false {return makeToken(T_BoolConstant); }
 \{ { return makeToken(T_LBrace); }
 \} { return makeToken(T_RBrace); }
 
+
   /* Ignore whitespace */
 [[:space:]] {}
 
   /* DELETE THIS EVENTUALLY OR THROW ERROR STRAY CHAR */
-.  { std::string s = "Stray "; return error(s + yytext, yylineno); }
+.  { std::string s = "Stray '"; return error(s + yytext + '\'', yylineno); }
 
 
 
