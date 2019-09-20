@@ -1,0 +1,16 @@
+/* Fall '14 A short test derived from one of many decaf files
+   I have lying around. Surely you'll want to write some other 
+   tests.  */
+
+int x; // purpose of this variable /* unknown */
+
+void main()
+{
+  int x;
+  int y;
+  for (x = 0x0; x < y == true ; x = x + 1.4e2) {
+    Print("Hello, world");
+    if (x % 2 == 0) 
+      Print("Even!", x);
+  }
+}
