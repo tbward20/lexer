@@ -12,6 +12,8 @@ string resultString;
 int startline;
 Token* myTok;
 
+int lineno = 1;
+
 int error(string msg, int line)
 {
   cout << msg << " on line " << line << endl;
@@ -19,7 +21,7 @@ int error(string msg, int line)
 }
 
 TokenType makeToken(TokenType type) {
-    myTok = new Token(type, yytext, yylineno);
+    myTok = new Token(type, yytext, lineno);
     return type;
 }
 
@@ -28,10 +30,9 @@ int ident_error(char * txt, int line) {
   return -1;
 }
 
-
 %}
 
-%option yylineno
+  /* %option yylineno */
 %x STRING
 %x ESC_CHAR
 %x BCOMM
@@ -43,7 +44,7 @@ anything .
   /* rules */
 
   /* block comment machine */
-\/\* { BEGIN(BCOMM); startline = yylineno; }
+\/\* { BEGIN(BCOMM); startline = lineno; }
 <BCOMM>\*\/ { BEGIN(INITIAL); }
 <BCOMM>.|\n {}
 <BCOMM><<EOF>> { return error("Missing */ for block comment starting", startline); }
@@ -81,13 +82,14 @@ ReadLine/{follow}?    { return makeToken(T_ReadLine); }
 [0-9]+|0[xX][a-fA-F0-9]+ { return makeToken(T_IntConstant); }
 
   /* Boolean constant */
-true|false {return makeToken(T_BoolConstant); }
+true  { return makeToken(T_BoolConstant); }
+false { return makeToken(T_BoolConstant); }
 
   /* Double Constant */
 [0-9]+.[0-9]*([eE]-?[0-9]+) { return makeToken(T_DoubleConstant); }
 
   /* identifier */
-[A-Za-z][A-Za-z0-9_]*/{follow}? { if (yyleng > 31) return ident_error(yytext, yylineno); return makeToken(T_Identifier); }
+[A-Za-z][A-Za-z0-9_]* { if (yyleng > 31) return ident_error(yytext, lineno); return makeToken(T_Identifier); }
 
 
   /* type ident */
@@ -100,12 +102,12 @@ true|false {return makeToken(T_BoolConstant); }
 \" { BEGIN(STRING); resultString = "\"";  }
 <STRING>[^\n"]* { resultString += yytext; }
 <STRING>\n      {return error("missing \" at end of string constant", 
-		yylineno-1); }
+		lineno-1); }
 <STRING><<EOF>>  {return error("missing \" at end of string constant", 
-		yylineno); } 
+		lineno); } 
 <STRING>\"     { BEGIN(INITIAL); 
 	         myTok = new Token(T_StringConstant,resultString + "\"", 
-                                  yylineno);
+                                  lineno);
 		 return T_StringConstant; }
 
   /* Operator tokens */
@@ -136,12 +138,14 @@ true|false {return makeToken(T_BoolConstant); }
 \{ { return makeToken(T_LBrace); }
 \} { return makeToken(T_RBrace); }
 
+  /* Increment line no */
+\n { lineno++; }
 
   /* Ignore whitespace */
 [[:space:]] {}
 
   /* DELETE THIS EVENTUALLY OR THROW ERROR STRAY CHAR */
-.  { std::string s = "Stray '"; return error(s + yytext + '\'', yylineno); }
+.  { std::string s = "Stray '"; return error(s + yytext + '\'', lineno); }
 
 
 
