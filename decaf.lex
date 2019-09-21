@@ -46,7 +46,8 @@ anything .
   /* block comment machine */
 \/\* { BEGIN(BCOMM); startline = lineno; }
 <BCOMM>\*\/ { BEGIN(INITIAL); }
-<BCOMM>.|\n { lineno++; }
+<BCOMM>.  { }
+<BCOMM>\n { lineno++; }
 <BCOMM><<EOF>> { return error("Missing */ for block comment starting", startline); }
  
   /* Single line comment */
