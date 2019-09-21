@@ -46,7 +46,7 @@ anything .
   /* block comment machine */
 \/\* { BEGIN(BCOMM); startline = lineno; }
 <BCOMM>\*\/ { BEGIN(INITIAL); }
-<BCOMM>.|\n {}
+<BCOMM>.|\n { lineno++; }
 <BCOMM><<EOF>> { return error("Missing */ for block comment starting", startline); }
  
   /* Single line comment */
@@ -101,7 +101,7 @@ false/{follow}? { return makeToken(T_BoolConstant); }
 
 \" { BEGIN(STRING); resultString = "\"";  }
 <STRING>[^\n"]* { resultString += yytext; }
-<STRING>\n      {return error("missing \" at end of string constant", 
+<STRING>\n      {lineno++; return error("missing \" at end of string constant", 
 		lineno-1); }
 <STRING><<EOF>>  {return error("missing \" at end of string constant", 
 		lineno); } 
