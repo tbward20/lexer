@@ -82,8 +82,8 @@ ReadLine/{follow}?    { return makeToken(T_ReadLine); }
 [0-9]+|0[xX][a-fA-F0-9]+ { return makeToken(T_IntConstant); }
 
   /* Boolean constant */
-true  { return makeToken(T_BoolConstant); }
-false { return makeToken(T_BoolConstant); }
+true/{follow}?  { return makeToken(T_BoolConstant); }
+false/{follow}? { return makeToken(T_BoolConstant); }
 
   /* Double Constant */
 [0-9]+.[0-9]*([eE]-?[0-9]+) { return makeToken(T_DoubleConstant); }
