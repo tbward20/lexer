@@ -87,7 +87,7 @@ true/{follow}?  { return makeToken(T_BoolConstant); }
 false/{follow}? { return makeToken(T_BoolConstant); }
 
   /* Double Constant */
-[0-9]+.[0-9]*([eE]-?[0-9]+) { return makeToken(T_DoubleConstant); }
+[0-9]+.[0-9]*([eE][+-]?[0-9]+)? { return makeToken(T_DoubleConstant); }
 
   /* identifier */
 [A-Za-z][A-Za-z0-9_]* { if (yyleng > 31) return ident_error(yytext, lineno); return makeToken(T_Identifier); }
@@ -146,7 +146,7 @@ false/{follow}? { return makeToken(T_BoolConstant); }
 [[:space:]] {}
 
   /* DELETE THIS EVENTUALLY OR THROW ERROR STRAY CHAR */
-.  { std::string s = "Stray '"; return error(s + yytext + '\'', lineno); }
+.  { std::string s = "stray '"; return error(s + yytext + '\'', lineno); }
 
 
 
